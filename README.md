@@ -13,3 +13,48 @@ How?
 2. The code searches for any snapshots that were created from the specific instance
 
 3. The code deletes the associated snapshot.
+
+
+**Step 1: Create the Lambda Function**
+Open the AWS Lambda Console.
+
+Click **Create function**.
+
+Choose **Author from scratch**.
+
+Function name: DeleteSnapshotsAfterTermination.
+
+Runtime: Select Python 3.12 (or the latest version).
+
+Click **Create function.**
+
+**Step 2: The Code**
+Replace the default code in the editor with this script:
+
+import boto3
+
+def lambda_handler(event, context):
+    ec2 = boto3.client('ec2')
+    
+    # 1. Get the Instance ID from the Event (the instance that just died)
+    instance_id = event['detail']['instance-id']
+    print(f"Cleaning up snapshots for terminated instance: {instance_id}")
+
+    # 2. Find all snapshots that belong to this Instance ID
+    # Note: We filter by the 'Description' because AWS includes the ID there
+    snapshots = ec2.describe_snapshots(
+        Filters=[
+            {'Name': 'description', 'Values': [f"*{instance_id}*"]}
+        ]
+    )['Snapshots']
+
+    # 3. Loop through and delete them
+    for snap in snapshots:
+        snap_id = snap['SnapshotId']
+        try:
+            print(f"Deleting snapshot: {snap_id}")
+            ec2.delete_snapshot(SnapshotId=snap_id)
+        except Exception as e:
+            print(f"Could not delete {snap_id}: {e}")
+
+    return {"status": "success"}
