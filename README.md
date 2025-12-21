@@ -31,8 +31,9 @@ Click **Create function.**
 **Step 2: The Code**
 Replace the default code in the editor with this script:
 
-import boto3
 
+```
+import boto3
 def lambda_handler(event, context):
     ec2 = boto3.client('ec2')
     
@@ -58,3 +59,4 @@ def lambda_handler(event, context):
             print(f"Could not delete {snap_id}: {e}")
 
     return {"status": "success"}
+```
