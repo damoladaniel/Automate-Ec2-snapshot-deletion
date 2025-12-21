@@ -60,3 +60,4 @@ def lambda_handler(event, context):
 
     return {"status": "success"}
 ```
+<img width="2038" height="761" alt="Code source" src="https://github.com/user-attachments/assets/a09112a1-db70-43ca-beb7-a7b17456230e" />
